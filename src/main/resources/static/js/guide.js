@@ -10,20 +10,20 @@ $(document).ready(function(){
 	}
 	checkStep(step)
 	var mySwiper = new Swiper ('.swiper-container', {
-		  	initialSlide: step,
-			paginationClickable:true,
-			spaceBetween:30,
-			noSwiping: true,
-			navigation: {
-		        nextEl: '.swiper-button-next',
-		        prevEl: '.swiper-button-prev',
-			},
-			mousewheelEventsTarged : '.swiper-slide',
-			mousewheelControl: true,
-	        observer:true,
-			observeParents:true
+		initialSlide: step,
+		paginationClickable:true,
+		spaceBetween:30,
+		noSwiping: true,
+		navigation: {
+			nextEl: '.swiper-button-next',
+			prevEl: '.swiper-button-prev',
+		},
+		mousewheelEventsTarged : '.swiper-slide',
+		mousewheelControl: true,
+		observer:true,
+		observeParents:true
 	})
-	
+
 	// 上一步按钮
 	$('.prevBtn').click(function(){
 		let s = Number(sessionStorage.getItem('guide_step'))
@@ -32,7 +32,7 @@ $(document).ready(function(){
 		sessionStorage.setItem('guide_step', s)
 		$('.swiper-button-prev').trigger('click');
 	})
-	
+
 	// 选择角色
 	$(".role_part").click(function(){
 		let r = sessionStorage.getItem('guide_role')
@@ -42,14 +42,14 @@ $(document).ready(function(){
 		$(this).addClass("role_active")
 	})
 	if (!role) {
-	//	get role and set sessionstorage
+		//	get role and set sessionstorage
 		$.get("getRole",function(value,status){
 			if (value) {
 				sessionStorage.setItem('guide_role', value)
 				role = value
-	            $(".role_part").each(function(){
-				  $(this).removeClass("role_active")
-	            })
+				$(".role_part").each(function(){
+					$(this).removeClass("role_active")
+				})
 				let part = $(".role_part")
 				if (value == 1) {
 					$(part[0]).addClass("role_active")
@@ -64,7 +64,7 @@ $(document).ready(function(){
 		let r = sessionStorage.getItem('guide_role')
 		$(".role_part").each(function(){
 			$(this).removeClass("role_active")
-	    })
+		})
 		let part = $(".role_part")
 		if (r == 1) {
 			$(part[0]).addClass("role_active")
@@ -95,23 +95,23 @@ $(document).ready(function(){
 			nav();
 		}
 		switch (e) {
-		 	case 0:
-		 		break;
-		 	case 1:
-		 		toNodeConfig();
-		 		break;
-		 	case 2:
-		 		getIdList();
-		 		break;
-		 	case 3:
-		 		toDbConfig();
-		 		break;
-		 	case 4:
-		 		toAccount();;
-	 			break;		
+			case 0:
+				break;
+			case 1:
+				toNodeConfig();
+				break;
+			case 2:
+				getIdList();
+				break;
+			case 3:
+				toDbConfig();
+				break;
+			case 4:
+				toAccount();;
+				break;
 		}
 	}
-	
+
 	function nav() {
 		$(".guide_step_part > .guide_step_item > span").each(function(){
 			var $step = $(this).html();
@@ -122,100 +122,100 @@ $(document).ready(function(){
 			}
 		})
 	}
-	
+
 	// 转节点配置，初始化已有的相关数据
 	function toNodeConfig() {
 		//获取配置
-	    $.get("loadConfig",function(data,status){
-	        $("#nodeForm  #orgId").val(data.org_id);
-	        $("#nodeForm  #amopId").val(data.amop_id);
-	        $("#nodeForm  #version").val(data.blockchain_fiscobcos_version);
-	        $("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
-	        $("#nodeForm  #ipPort").val(data.blockchain_address);
+		$.get("loadConfig",function(data,status){
+			$("#nodeForm  #orgId").val(data.org_id);
+			$("#nodeForm  #amopId").val(data.amop_id);
+			$("#nodeForm  #version").val(data.blockchain_fiscobcos_version);
+			$("#nodeForm  #cnsProFileActive").val(data.cns_profile_active);
+			$("#nodeForm  #ipPort").val(data.blockchain_address);
 //	        $("#nodeForm  #groupId").val(data.group_id);
-	        caDisplay(data.blockchain_fiscobcos_version);
-	        checkCa(data);
-	    });
+			caDisplay(data.blockchain_fiscobcos_version);
+			checkCa(data);
+		});
 	}
-	
+
 	// 证书检查
 	function  checkCa(data) {
-    	var message = "该证书已存在，重新上传将被覆盖。";
-    	if (data["ca.crt"] == "true") {
-    		$("#caCrtSpan").html(message).show();
-    	}
-    	if (data["node.key"] == "true") {
-    		$("#nodeKeySpan").html(message).show();
-    	}
-    	if (data["node.crt"] == "true") {
-    		$("#nodeCrtSpan").html(message).show();
-    	}
-    	if (data["client.keystore"] == "true") {
-    		$("#clientKeyStoreSpan").html(message).show();
-    	}
-    }
-    
-    function caDisplay(v) {
-    	if (v == "1") {
-        	$("#caV1").show();
-        	$("#caV2").hide();
-        } else {
-        	$("#caV2").show();
-        	$("#caV1").hide();
-        }
-    }
-    
-    $("#nodeForm  #version").change(function(){
-    	var selected = $(this).children('option:selected').val();
-    	caDisplay(selected);
-    })
-	
+		var message = "该证书已存在，重新上传将被覆盖。";
+		if (data["ca.crt"] == "true") {
+			$("#caCrtSpan").html(message).show();
+		}
+		if (data["node.key"] == "true") {
+			$("#nodeKeySpan").html(message).show();
+		}
+		if (data["node.crt"] == "true") {
+			$("#nodeCrtSpan").html(message).show();
+		}
+		if (data["client.keystore"] == "true") {
+			$("#clientKeyStoreSpan").html(message).show();
+		}
+	}
+
+	function caDisplay(v) {
+		if (v == "1") {
+			$("#caV1").show();
+			$("#caV2").hide();
+		} else {
+			$("#caV2").show();
+			$("#caV1").hide();
+		}
+	}
+
+	$("#nodeForm  #version").change(function(){
+		var selected = $(this).children('option:selected').val();
+		caDisplay(selected);
+	})
+
 	// 点击配置节点按钮
 	$('#postNodeBtn').click(function(){
 		var disabled = $(this).attr("class").indexOf("disabled");
-        if(disabled > 0) return;
-        var message = checkInputNode();
-        if (message != null) {
-        	$("#messageBody").html("<p>"+message+"</p>");
-    	    $("#modal-message").modal();
-    	    return ;
-        }
-        
-	    var formData = new FormData();
-	    formData.append("file", $("#caCrtFile")[0].files[0]);
-	    formData.append("file", $("#nodeCrtFile")[0].files[0]);
-	    formData.append("file", $("#nodeKeyFile")[0].files[0]);
-	    formData.append("file", $("#clientKeyStoreFile")[0].files[0]);
-	    formData.append("orgId", $.trim($("#nodeForm  #orgId").val()));
-	    formData.append("amopId", $.trim($("#nodeForm  #amopId").val()));
-	    formData.append("version", $("#nodeForm  #version").val());
-	    formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
-	    formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
+		if(disabled > 0) return;
+		var message = checkInputNode();
+		if (message != null) {
+			$("#messageBody").html("<p>"+message+"</p>");
+			$("#modal-message").modal();
+			return ;
+		}
+
+		var formData = new FormData();
+		formData.append("file", $("#caCrtFile")[0].files[0]);
+		formData.append("file", $("#nodeCrtFile")[0].files[0]);
+		formData.append("file", $("#nodeKeyFile")[0].files[0]);
+		formData.append("file", $("#clientKeyStoreFile")[0].files[0]);
+		formData.append("orgId", $.trim($("#nodeForm  #orgId").val()));
+		formData.append("amopId", $.trim($("#nodeForm  #amopId").val()));
+		formData.append("version", $("#nodeForm  #version").val());
+		formData.append("cnsProFileActive", $("#nodeForm  #cnsProFileActive").val());
+		formData.append("ipPort", $.trim($("#nodeForm  #ipPort").val()));
 //	    formData.append("groupId", $.trim($("#nodeForm  #groupId").val()));
-	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
-	    $("#modal-default").modal();
-	    $("#goNext").addClass("disabled");
-	    $('#postNodeBtn').addClass("disabled");
-	    $.ajax({
-	        url:'nodeConfigUpload', /*接口域名地址*/
-	        type:'post',
-	        data: formData,
-	        contentType: false,
-	        processData: false,
-	        success:function(res) {
-	            if (res=="success") {
-	            	//检查节点是否正确
-	            	$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
-	            	setTimeout(checkNodeForTimeout,2000);
-	            } else {
-	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
-	            	 $('#postNodeBtn').removeClass("disabled");
-	            }
-	            $("#modal-default").modal();
-	        }
-	    })	
+		$("#checkBody").html("<p>配置提交中,请稍后...</p>");
+		$("#modal-default").modal();
+		$("#goNext").addClass("disabled");
+		$('#postNodeBtn').addClass("disabled");
+		$.ajax({
+			url:'nodeConfigUpload', /*接口域名地址*/
+			type:'post',
+			data: formData,
+			contentType: false,
+			processData: false,
+			success:function(res) {
+				if (res=="success") {
+					//检查节点是否正确
+					$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
+					setTimeout(checkNodeForTimeout,2000);
+				} else {
+					$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+					$('#postNodeBtn').removeClass("disabled");
+				}
+				$("#modal-default").modal();
+			}
+		})
 	});
-	
+
 	// 检查节点输入信息
 	function checkInputNode() {
 		var orgId = $.trim($("#nodeForm  #orgId").val());
@@ -257,25 +257,25 @@ $(document).ready(function(){
 		}
 		return null;
 	}
-	
+
 	// 配置提交成功后进行节点检查
-    function checkNodeForTimeout() {
-    	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
-    	$("#modal-default").modal();
-    	setTimeout(checkNode,2000);
-    }
-    
-    // 节点检查
-    function checkNode() {
-    	$.get("checkNode",function(data,status){
-            if(data == "success") {//检查成功
-         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
+	function checkNodeForTimeout() {
+		$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
+		$("#modal-default").modal();
+		setTimeout(checkNode,2000);
+	}
+
+	// 节点检查
+	function checkNode() {
+		$.get("checkNode",function(data,status){
+			if(data == "success") {//检查成功
+				$("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
 				$("#goNext").removeClass("disabled");
-				$('#postNodeBtn').removeClass("disabled");
 				$("#goNext").addClass("nodeGoNext");
+				$('#postNodeBtn').removeClass("disabled");
 				//disabledInput(); //禁止修改操作
-         	    $("#goNext").click(function(){
-					let hasClass = $(this).hasClass('nodeGoNext')	
+				$("#goNext").click(function(){
+					let hasClass = $(this).hasClass('nodeGoNext')
 					if (hasClass) {
 						sessionStorage.setItem('guide_step', '2')
 						$("#modal-default").modal("hide");
@@ -284,36 +284,36 @@ $(document).ready(function(){
 //						toDbConfig();
 						getIdList()
 					}
-         	   })
-            } else if (data == "fail"){//检查失败
-         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
-            } else {//检查失败
-         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>: " + data + "</p>");
-            }
-            $('#postNodeBtn').removeClass("disabled");
-            $("#modal-default").modal();
-         });
-    }
-    // 获取群主ID
-    function getIdList() {
-		$("#guide_groupID").loadSelect("getAllGroup/false","value", "value",function(data){
-	    	$.get("loadConfig",function(data,status){
-	    		//获取设置的groupId
-	    		const id = data.group_id
-	    		const str = "option[value='"+ id +"']"
-	    		$("#guide_groupID").find(str).prop("selected",true);
-		    })
+				})
+			} else if (data == "fail"){//检查失败
+				$("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+			} else {//检查失败
+				$("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>: " + data + "</p>");
+			}
+			$('#postNodeBtn').removeClass("disabled");
+			$("#modal-default").modal();
 		});
-    	
-    }
-    // 点击群组ID下一步
-    $('#setGroupId').click(function(){
-    	let val = $('#guide_groupID').find('option:selected').val()
-    	const formData = {}
-    	formData.groupId = val
-    	$.post("setGroupId", formData, function(value,status){
+	}
+	// 获取群主ID
+	function getIdList() {
+		$("#guide_groupID").loadSelect("getAllGroup/false","value", "value",function(data){
+			$.get("loadConfig",function(data,status){
+				//获取设置的groupId
+				const id = data.group_id
+				const str = "option[value='"+ id +"']"
+				$("#guide_groupID").find(str).prop("selected",true);
+			})
+		});
+
+	}
+	// 点击群组ID下一步
+	$('#setGroupId').click(function(){
+		let val = $('#guide_groupID').find('option:selected').val()
+		const formData = {}
+		formData.groupId = val
+		$.post("setGroupId", formData, function(value,status){
 			if (value) {
-		    	sessionStorage.setItem('guide_step', '3')
+				sessionStorage.setItem('guide_step', '3')
 				$('.swiper-button-next').trigger('click');
 				toDbConfig();
 			} else {
@@ -321,148 +321,225 @@ $(document).ready(function(){
 			}
 		})
 
-    })
-    
-    function toDbConfig() {
-    	$.get("loadConfig",function(data,status){
-            $("#dbForm  #mysql_address").val(data.mysql_address);
-            $("#dbForm  #mysql_database").val(data.mysql_database);
-            $("#dbForm  #mysql_username").val(data.mysql_username);
-            $("#dbForm  #mysql_password").val(data.mysql_password);
-        });
-    	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>");
-    	$("#modal-message").modal();
-    }
-    
-    // 提交数据库配置
-    $("#postDbBtn").click(function(){
-    	var disabled = $(this).attr("class").indexOf("disabled");
-        if(disabled > 0) return;
-        var message = checkInputDB();
-        if (message != null) {
-        	$("#messageBody").html("<p>"+message+"</p>");
-    	    $("#modal-message").modal();
-    	    return ;
-        }
-	    var formData = new FormData();
-	    formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
-	    formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
-	    formData.append("mysql_username", $.trim($("#dbForm  #mysql_username").val()));
-	    formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
-	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
-	    $("#modal-default").modal();
-	    $("#goNext").addClass("disabled");
-	    $("#postDbBtn").addClass("disabled");
-	    $.ajax({
-	        url:'submitDbConfig', /*接口域名地址*/
-	        type:'post',
-	        data: formData,
-	        contentType: false,
-	        processData: false,
-	        success:function(res) {
-	            if (res=="success") {
-	            	//检查节点是否正确
-	            	$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
-	            	setTimeout(checkDbForTimeout,2000);
-	            } else {
-	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
-	            	 $('#postDbBtn').removeClass("disabled");
-	            }
-	            $("#modal-default").modal();
-	        }
-	    })
-    });
-    
-    function checkInputDB() {
-    	var address = $.trim($("#dbForm  #mysql_address").val());
-    	if (address.length == 0) {
-    		return "请输入您的数据库地址";
-    	}
-    	var database = $.trim($("#dbForm  #mysql_database").val());
-    	if (database.length == 0) {
-    		return "请输入您的数据库名称";
-    	}
-    	var username = $.trim($("#dbForm  #mysql_username").val());
-    	if (username.length == 0) {
-    		return "请输入您的数据库用户名";
-    	}
-    	var password = $.trim($("#dbForm  #mysql_password").val());
-    	if (password.length == 0) {
-    		return "请输入您的数据库密码";
-    	}
-    	return null;
-    }
-    
-    function checkDbForTimeout() {
-    	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
-    	$("#modal-default").modal();
-    	setTimeout(checkdb,2000);
-    }
-    
-    function checkdb() {
-    	$.get("checkDb",function(data,status){
-           if(data) {//检查成功
-        	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
-			   $("#goNext").removeClass("disabled");
-			   $('#postDbBtn').removeClass("disabled");
-			   //disabledInput();
-			   $("#goNext").addClass("bdGoNext");
-        	   $("#goNext").click(function(){
-        		   let hasClass = $(this).hasClass('bdGoNext')	
-        		   if (hasClass) {
-        			   $("#modal-default").modal("hide");
-        			   $("#goNext").removeClass("nodeGoNext");
-        			   $("#goNext").removeClass("bdGoNext");
-        			   $("#modal-default").modal("hide");
-        			   var formData = {};
-        			   $.post("checkOrgId", formData, function(value,status){
-        				  if (value == 1) {
-        					  // 流程走完
-        					  sessionStorage.removeItem('guide_step')
-        					  toIndex();
-        				  } else if (value == 0){
-        					  $('.swiper-button-next').trigger('click');
-        					  sessionStorage.setItem('guide_step', '4')
-        					  toAccount();
-        				  } else {
-        					  $("#messageBody").html("<p><span class='fail-span'>程序出现异常，请查看日志</span></p>");
-        			    	  $("#modal-message").modal();
-        				  }
-        			   })	
-        		   }	
-          	  })
-           } else {//检查失败
-        	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
-           }
-           $('#postDbBtn').removeClass("disabled");
-           $("#modal-default").modal();
-        });
-    }
-    // 点击选择生成秘钥
-    $('.key_item').click(function(){
-    	$('.key_item').removeClass('active_key')
-    	$(this).addClass('active_key')
-    })
-    // 选择完秘钥方式点击下一步
-    $('#caretKeyBtn').click(function(){
-    	let type = $('.active_key').attr('type')
-    	if (type == 1) {
-    		// 系统自动创建公钥
-    		var thisObj = this;
+	})
+
+	function toDbConfig() {
+		$.get("loadConfig",function(data,status){
+			$("#dbForm  #mysql_address").val(data.mysql_address);
+			$("#dbForm  #mysql_database").val(data.mysql_database);
+			$("#dbForm  #mysql_username").val(data.mysql_username);
+			$("#dbForm  #mysql_password").val(data.mysql_password);
+			$("#dbForm  #redis_address").val(data.redis_address);
+			$("#dbForm  #redis_password").val(data.redis_password);
+		});
+		$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>");
+		$("#modal-message").modal();
+	}
+
+	function dbDisplay(v) {
+		if (v == "mysql") {
+			$("#mysqlForm").show();
+			$("#redisForm").hide();
+		} else {
+			$("#redisForm").show();
+			$("#mysqlForm").hide();
+		}
+	}
+
+	$("#dbForm  #db_version").change(function(){
+		var selected = $(this).children('option:selected').val();
+		console.log(selected);
+		dbDisplay(selected);
+	})
+
+	// 提交数据库配置
+	$("#postDbBtn").click(function(){
+		var disabled = $(this).attr("class").indexOf("disabled");
+		if(disabled > 0) return;
+		var message = checkInputDB();
+		if (message != null) {
+			$("#messageBody").html("<p>"+message+"</p>");
+			$("#modal-message").modal();
+			return ;
+		}
+		var formData = new FormData();
+		var dbVersion = $.trim($("#dbForm  #db_version").val());
+		console.log(dbVersion);
+		formData.append("db_version", dbVersion);
+		if (dbVersion == "mysql") {
+			formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
+			formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
+			formData.append("mysql_username", $.trim($("#dbForm  #mysql_username").val()));
+			formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
+		} else {
+			formData.append("redis_address", $.trim($("#dbForm  #redis_address").val()));
+			formData.append("redis_password", $.trim($("#dbForm  #redis_password").val()));
+		}
+		$("#checkBody").html("<p>配置提交中,请稍后...</p>");
+		$("#modal-default").modal();
+		$("#goNext").addClass("disabled");
+		$("#postDbBtn").addClass("disabled");
+		$.ajax({
+			url:'submitDbConfig', /*接口域名地址*/
+			type:'post',
+			data: formData,
+			contentType: false,
+			processData: false,
+			success:function(res) {
+				if (res=="success") {
+					//检查节点是否正确
+					$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
+					setTimeout(checkForTimeout,2000);
+				} else {
+					$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+					$('#postDbBtn').removeClass("disabled");
+				}
+				$("#modal-default").modal();
+			}
+		})
+	});
+
+	function checkInputDB() {
+		var dbVersion = $.trim($("#dbForm  #db_version").val());
+		if (dbVersion == "mysql") {
+			var address = $.trim($("#dbForm  #mysql_address").val());
+			if (address.length == 0) {
+				return "请输入您的数据库地址";
+			}
+			var database = $.trim($("#dbForm  #mysql_database").val());
+			if (database.length == 0) {
+				return "请输入您的数据库名称";
+			}
+			var username = $.trim($("#dbForm  #mysql_username").val());
+			if (username.length == 0) {
+				return "请输入您的数据库用户名";
+			}
+			var password = $.trim($("#dbForm  #mysql_password").val());
+			if (password.length == 0) {
+				return "请输入您的数据库密码";
+			}
+		} else {
+			var redisAddress = $.trim($("#dbForm  #redis_address").val());
+			if (redisAddress.length == 0) {
+				return "请输入您的服务器地址";
+			}
+		}
+		return null;
+	}
+
+	function checkForTimeout() {
+		$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
+		$("#modal-default").modal();
+		setTimeout(checkpersistence,2000);
+	}
+//   function redisCheckForTimeout() {
+//        $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查中,请稍后...</p>");
+//        setTimeout(checkredis,2000);
+//    }
+
+	function checkpersistence() {
+		$.get("checkPersistence",function(data,status){
+			if(data) {//检查成功
+				$("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
+				$("#goNext").removeClass("disabled");
+				$('#postDbBtn').removeClass("disabled");
+				//disabledInput();
+				$("#goNext").addClass("bdGoNext");
+				$("#goNext").click(function(){
+					let hasClass = $(this).hasClass('bdGoNext')
+					if (hasClass) {
+						$("#modal-default").modal("hide");
+						$("#goNext").removeClass("nodeGoNext");
+						$("#goNext").removeClass("bdGoNext");
+						$("#modal-default").modal("hide");
+						var formData = {};
+						$.post("checkOrgId", formData, function(value,status){
+							if (value == 1) {
+								// 流程走完
+								sessionStorage.removeItem('guide_step')
+								toIndex();
+							} else if (value == 0){
+								$('.swiper-button-next').trigger('click');
+								sessionStorage.setItem('guide_step', '4')
+								toAccount();
+							} else {
+								$("#messageBody").html("<p><span class='fail-span'>程序出现异常，请查看日志</span></p>");
+								$("#modal-message").modal();
+							}
+						})
+					}
+				})
+			} else {//检查失败
+				$("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+			}
+		});
+	}
+
+	function checkredis() {
+		$.get("checkRedis",function(data,status){
+			if(data) {//检查成功
+				$("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
+				$("#goNext").removeClass("disabled");
+				//disabledInput();
+				$("#goNext").addClass("bdGoNext");
+				$("#goNext").click(function(){
+					let hasClass = $(this).hasClass('bdGoNext')
+					if (hasClass) {
+						$("#modal-default").modal("hide");
+						$("#goNext").removeClass("nodeGoNext");
+						$("#goNext").removeClass("bdGoNext");
+						$("#modal-default").modal("hide");
+						var formData = {};
+						$.post("checkOrgId", formData, function(value,status){
+							if (value == 1) {
+								// 流程走完
+								sessionStorage.removeItem('guide_step')
+								toIndex();
+							} else if (value == 0){
+								$('.swiper-button-next').trigger('click');
+								sessionStorage.setItem('guide_step', '4')
+								toAccount();
+							} else {
+								$("#messageBody").html("<p><span class='fail-span'>程序出现异常，请查看日志</span></p>");
+								$("#modal-message").modal();
+							}
+						})
+					}
+				})
+			} else {//检查失败
+				$("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+			}
+			$('#postDbBtn').removeClass("disabled");
+			$("#modal-default").modal();
+		});
+	}
+
+	// 点击选择生成秘钥
+	$('.key_item').click(function(){
+		$('.key_item').removeClass('active_key')
+		$(this).addClass('active_key')
+	})
+	// 选择完秘钥方式点击下一步
+	$('#caretKeyBtn').click(function(){
+		let type = $('.active_key').attr('type')
+		if (type == 1) {
+			// 系统自动创建公钥
+			var thisObj = this;
 			var disabled = $(thisObj).attr("class").indexOf("disabled");
-	        if(disabled > 0) return;
-	        $.confirm("请确认，系统将自动为管理员的 WeID 创建公私钥?",function(){
+			if(disabled > 0) return;
+			$.confirm("请确认，系统将自动为管理员的 WeID 创建公私钥?",function(){
 				createAdmin(thisObj);
-		    })
-    	} else {
-    		// 选择私钥
-    		$('#modal-create-pri').modal()
-    	}
-    })
-    
-    var hasAccount = false;
-    // 转到账户配置
-    function toAccount() {
+			})
+		} else {
+			// 选择私钥
+			$('#modal-create-pri').modal()
+		}
+	})
+
+
+	var hasAccount = false;
+	// 转到账户配置
+	function toAccount() {
 		$("#accountDiv").hide();
 		$("#createDiv").hide();
 		$.get("checkAdmin",function(data,status){
@@ -480,50 +557,50 @@ $(document).ready(function(){
 				hasAccount = false;
 			}
 			$("#nextBtn").removeClass("disabled");
-	    });
+		});
 	}
-    
-    $("#craeteByPrivBtn").click(function(){
+
+	$("#craeteByPrivBtn").click(function(){
 		var thisObj = this;
 		var disabled = $(thisObj).attr("class").indexOf("disabled");
-        if(disabled > 0) return;
-        $.confirm("请确认，是否使用当前私钥文件为管理员的 WeID 创建公私钥?",function(){
+		if(disabled > 0) return;
+		$.confirm("请确认，是否使用当前私钥文件为管理员的 WeID 创建公私钥?",function(){
 			createAdmin(thisObj);
-	    })
-    });
-	
+		})
+	});
+
 	$("#createBySysBtn").click(function(){
 		var thisObj = this;
 		var disabled = $(thisObj).attr("class").indexOf("disabled");
-        if(disabled > 0) return;
-        $.confirm("确定系统自动创建 admin 账户的公私钥?",function(){
+		if(disabled > 0) return;
+		$.confirm("确定系统自动创建 admin 账户的公私钥?",function(){
 			createAdmin(thisObj);
-	    })
-    });
+		})
+	});
 
 	function createAdmin(obj) {
 		$(obj).addClass("disabled");
-	    var formData = new FormData();
-	    formData.append("ecdsa", $("#privateKeyFile")[0].files[0]);
-	    $("#checkBody").html("<p>账户创建中,请稍后...</p>");
-	    $("#goNext").addClass("disabled");
-	    $("#modal-default").modal();
-	    $.ajax({
-	        url:'createAdmin', /*接口域名地址*/
-	        type:'post',
-	        data: formData,
-	        contentType: false,
-	        processData: false,
-	        success:function(res) {
-	            if (res=="fail") {
-	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+		var formData = new FormData();
+		formData.append("ecdsa", $("#privateKeyFile")[0].files[0]);
+		$("#checkBody").html("<p>账户创建中,请稍后...</p>");
+		$("#goNext").addClass("disabled");
+		$("#modal-default").modal();
+		$.ajax({
+			url:'createAdmin', /*接口域名地址*/
+			type:'post',
+			data: formData,
+			contentType: false,
+			processData: false,
+			success:function(res) {
+				if (res=="fail") {
+					$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
 //	            	$("#postBtn").removeClass("disabled");
-	            	$(obj).removeClass("disabled");
-	            } else {
-	            	$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='success-span'>成功</span>。</p>");
-	            	// 新增的内容开始
-	            	$(".card-title").html("当前admin账户");
-	            	$("#createDiv").hide();
+					$(obj).removeClass("disabled");
+				} else {
+					$("#checkBody").html($("#checkBody").html() + "<p>账户创建<span class='success-span'>成功</span>。</p>");
+					// 新增的内容开始
+					$(".card-title").html("当前admin账户");
+					$("#createDiv").hide();
 					$("#accountDiv").show();
 					$("#nextDiv").show();
 					$("#account").val(res);
@@ -532,23 +609,23 @@ $(document).ready(function(){
 					$("#nextBtn").removeClass("disabled");
 					// 新增的内容结束
 //	            	$("#configBtn").removeClass("disabled");
-	            	$("#goNext").removeClass("disabled");
-	            	$("#goNext").click(function(){
-	            		if (role == "2") {
-	            			sessionStorage.removeItem('guide_step')
-	            			toIndex();
-	            		} else {
-	            			$('.swiper-button-next').trigger('click');
-		            		$("#modal-default").modal("hide");
-		            		$("#modal-create-pri").modal("hide");
-		            		sessionStorage.setItem('guide_step', '5')
-	            		}
-	            	})
-	            }
-	            $(obj).removeClass("disabled");
-	            toAccount();
-	        }
-	    })
+					$("#goNext").removeClass("disabled");
+					$("#goNext").click(function(){
+						if (role == "2") {
+							sessionStorage.removeItem('guide_step')
+							toIndex();
+						} else {
+							$('.swiper-button-next').trigger('click');
+							$("#modal-default").modal("hide");
+							$("#modal-create-pri").modal("hide");
+							sessionStorage.setItem('guide_step', '5')
+						}
+					})
+				}
+				$(obj).removeClass("disabled");
+				toAccount();
+			}
+		})
 	}
 	// 点击跳过	
 	$('#dbPassBtn').click(function(){
@@ -564,11 +641,11 @@ $(document).ready(function(){
 				toAccount();
 			} else {
 				$("#messageBody").html("<p><span class='fail-span'>程序出现异常，请查看日志</span></p>");
-	    	    $("#modal-message").modal();
+				$("#modal-message").modal();
 			}
-		})	
+		})
 	})
-	
+
 	$("#nextBtn").click(function(){
 		if(role == "2") {
 			toIndex();
@@ -577,12 +654,12 @@ $(document).ready(function(){
 			sessionStorage.setItem('guide_step', '5')
 		}
 	})
-	
+
 	function toIndex() {
 		var formData = {};
 		formData.step = "5";
 		$.post("setGuideStatus", formData, function(value,status){
 			window.location.href="index.html";
-		})	
+		})
 	}
 })
