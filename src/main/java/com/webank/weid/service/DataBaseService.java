@@ -25,10 +25,10 @@ import org.springframework.stereotype.Service;
 
 import com.webank.weid.constant.DataDriverConstant;
 import com.webank.weid.constant.SqlConstant;
-import com.webank.weid.suite.api.persistence.Persistence;
-import com.webank.weid.suite.persistence.sql.ConnectionPool;
-import com.webank.weid.suite.persistence.sql.SqlExecutor;
-import com.webank.weid.suite.persistence.sql.driver.MysqlDriver;
+import com.webank.weid.suite.persistence.mysql.ConnectionPool;
+import com.webank.weid.suite.persistence.mysql.SqlExecutor;
+import com.webank.weid.suite.api.persistence.inf.Persistence;
+import com.webank.weid.suite.api.persistence.PersistenceFactory;
 
 @Service
 public class DataBaseService {
@@ -51,14 +51,14 @@ public class DataBaseService {
     
     private Persistence getPersistence() {
         if (persistence == null) {
-            persistence = new MysqlDriver();
+            persistence = PersistenceFactory.newMysqlDriver();
         }
         return persistence;
     }
     
     private SqlExecutor getSqlExecutor() {
         if (sqlExecutor == null) {
-            sqlExecutor = new SqlExecutor(ConnectionPool.getFirstDataSourceName()); 
+            sqlExecutor = new SqlExecutor(ConnectionPool.getFirstDataSourceName());
         }
         return sqlExecutor;
     }

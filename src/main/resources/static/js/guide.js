@@ -322,11 +322,29 @@ $(document).ready(function(){
             $("#dbForm  #mysql_database").val(data.mysql_database);
             $("#dbForm  #mysql_username").val(data.mysql_username);
             $("#dbForm  #mysql_password").val(data.mysql_password);
+            $("#dbForm  #redis_address").val(data.redis_address);
+            $("#dbForm  #redis_password").val(data.redis_password);
         });
     	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>");
     	$("#modal-message").modal();
     }
-    
+
+    function dbDisplay(v) {
+        if (v == "mysql") {
+            $("#mysqlForm").show();
+            $("#redisForm").hide();
+        } else {
+            $("#redisForm").show();
+            $("#mysqlForm").hide();
+        }
+    }
+
+    $("#dbForm  #db_version").change(function(){
+        var selected = $(this).children('option:selected').val();
+        console.log(selected);
+        dbDisplay(selected);
+    })
+
     // 提交数据库配置
     $("#postDbBtn").click(function(){
     	var disabled = $(this).attr("class").indexOf("disabled");
@@ -338,58 +356,78 @@ $(document).ready(function(){
     	    return ;
         }
 	    var formData = new FormData();
-	    formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
-	    formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
-	    formData.append("mysql_username", $.trim($("#dbForm  #mysql_username").val()));
-	    formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
-	    $("#checkBody").html("<p>配置提交中,请稍后...</p>");
-	    $("#modal-default").modal();
-	    $("#goNext").addClass("disabled");
-	    $.ajax({
-	        url:'submitDbConfig', /*接口域名地址*/
-	        type:'post',
-	        data: formData,
-	        contentType: false,
-	        processData: false,
-	        success:function(res) {
-	            if (res=="success") {
-	            	//检查节点是否正确
-	            	$("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
-	            	setTimeout(checkDbForTimeout,2000);
-	            } else {
-	            	 $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
-	            }
-	        }
-	    })
+	    var dbVersion = $.trim($("#dbForm  #db_version").val());
+	    console.log(dbVersion);
+	    formData.append("db_version", dbVersion);
+	    if (dbVersion == "mysql") {
+            formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
+            formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
+            formData.append("mysql_username", $.trim($("#dbForm  #mysql_username").val()));
+            formData.append("mysql_password", $.trim($("#dbForm  #mysql_password").val()));
+        } else {
+            formData.append("redis_address", $.trim($("#dbForm  #redis_address").val()));
+            formData.append("redis_password", $.trim($("#dbForm  #redis_password").val()));
+        }
+        $("#checkBody").html("<p>配置提交中,请稍后...</p>");
+        $("#modal-default").modal();
+        $("#goNext").addClass("disabled");
+        $.ajax({
+            url:'submitDbConfig', /*接口域名地址*/
+            type:'post',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success:function(res) {
+                if (res=="success") {
+                    //检查节点是否正确
+                    $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
+                    setTimeout(checkForTimeout,2000);
+                } else {
+                     $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
+                }
+            }
+        })
     });
     
     function checkInputDB() {
-    	var address = $.trim($("#dbForm  #mysql_address").val());
-    	if (address.length == 0) {
-    		return "请输入您的数据库地址";
-    	}
-    	var database = $.trim($("#dbForm  #mysql_database").val());
-    	if (database.length == 0) {
-    		return "请输入您的数据库名称";
-    	}
-    	var username = $.trim($("#dbForm  #mysql_username").val());
-    	if (username.length == 0) {
-    		return "请输入您的数据库用户名";
-    	}
-    	var password = $.trim($("#dbForm  #mysql_password").val());
-    	if (password.length == 0) {
-    		return "请输入您的数据库密码";
+        var dbVersion = $.trim($("#dbForm  #db_version").val());
+        if (dbVersion == "mysql") {
+            var address = $.trim($("#dbForm  #mysql_address").val());
+            if (address.length == 0) {
+                return "请输入您的数据库地址";
+            }
+            var database = $.trim($("#dbForm  #mysql_database").val());
+            if (database.length == 0) {
+                return "请输入您的数据库名称";
+            }
+            var username = $.trim($("#dbForm  #mysql_username").val());
+            if (username.length == 0) {
+                return "请输入您的数据库用户名";
+            }
+            var password = $.trim($("#dbForm  #mysql_password").val());
+            if (password.length == 0) {
+                return "请输入您的数据库密码";
+            }
+    	} else {
+            var redisAddress = $.trim($("#dbForm  #redis_address").val());
+            if (redisAddress.length == 0) {
+                return "请输入您的服务器地址";
+            }
     	}
     	return null;
     }
     
-    function checkDbForTimeout() {
+    function checkForTimeout() {
     	$("#checkBody").html($("#checkBody").html() + "<p>配置检查中,请稍后...</p>");
-    	setTimeout(checkdb,2000);
+    	setTimeout(checkpersistence,2000);
     }
+//   function redisCheckForTimeout() {
+//        $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>配置检查中,请稍后...</p>");
+//        setTimeout(checkredis,2000);
+//    }
     
-    function checkdb() {
-    	$.get("checkDb",function(data,status){
+    function checkpersistence() {
+    	$.get("checkPersistence",function(data,status){
            if(data) {//检查成功
         	   $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
 			   $("#goNext").removeClass("disabled");
@@ -424,6 +462,44 @@ $(document).ready(function(){
            }
         });
     }
+
+    function checkredis() {
+        $.get("checkRedis",function(data,status){
+           if(data) {//检查成功
+               $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
+               $("#goNext").removeClass("disabled");
+               //disabledInput();
+               $("#goNext").addClass("bdGoNext");
+               $("#goNext").click(function(){
+                   let hasClass = $(this).hasClass('bdGoNext')
+                   if (hasClass) {
+                       $("#modal-default").modal("hide");
+                       $("#goNext").removeClass("nodeGoNext");
+                       $("#goNext").removeClass("bdGoNext");
+                       $("#modal-default").modal("hide");
+                       var formData = {};
+                       $.post("checkOrgId", formData, function(value,status){
+                          if (value == 1) {
+                              // 流程走完
+                              sessionStorage.removeItem('guide_step')
+                              toIndex();
+                          } else if (value == 0){
+                              $('.swiper-button-next').trigger('click');
+                              sessionStorage.setItem('guide_step', '4')
+                              toAccount();
+                          } else {
+                              $("#messageBody").html("<p><span class='fail-span'>程序出现异常，请查看日志</span></p>");
+                              $("#modal-message").modal();
+                          }
+                       })
+                   }
+              })
+           } else {//检查失败
+               $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
+           }
+        });
+    }
+
     // 点击选择生成秘钥
     $('.key_item').click(function(){
     	$('.key_item').removeClass('active_key')

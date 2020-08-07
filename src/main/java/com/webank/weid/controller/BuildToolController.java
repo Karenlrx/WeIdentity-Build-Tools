@@ -100,6 +100,8 @@ public class BuildToolController {
     private static boolean nodeCheck = false;
     
     private static boolean dbCheck = false;
+
+    private static boolean redisCheck = false;
     
     private static String preMainHash;
 
@@ -132,8 +134,8 @@ public class BuildToolController {
     
     @GetMapping("/dbCheckState")
     public boolean dbCheckState() {
-        if (!dbCheck) {
-            return checkDb();
+        if (!dbCheck || !redisCheck) {
+            return checkPersistence();
         }
         return true;
     }
@@ -485,30 +487,42 @@ public class BuildToolController {
     public String submitDbConfig(HttpServletRequest request) {
         logger.info("[submitDbConfig] begin submit dbconfig...");
         dbCheck = false;
-        String address = request.getParameter("mysql_address");
+        String mysqlAddress = request.getParameter("mysql_address");
         String database = request.getParameter("mysql_database");
         String username = request.getParameter("mysql_username");
-        String password = request.getParameter("mysql_password");
+        String mysqlPassword = request.getParameter("mysql_password");
+        String redisAddress = request.getParameter("redis_address");
+        String redisPassword = request.getParameter("redis_password");
         //根据模板生成配置文件
-        if(configService.processDbConfig(address, database, username, password)) {
+        if(configService.processDbConfig(mysqlAddress, database, username, mysqlPassword,
+                redisAddress, redisPassword)) {
             return BuildToolsConstant.SUCCESS;
         }
         return BuildToolsConstant.FAIL;
     }
     
     @Description("数据库检查")
-    @GetMapping("/checkDb")
-    public boolean checkDb() {
+    @GetMapping("/checkPersistence")
+    public boolean checkPersistence() {
         dbCheck = false;
+        redisCheck = false;
         if (!configService.isExistsForProperties()) {
             return false;
         }
-        logger.info("[checkDb] begin check the db...");
-        dbCheck = configService.checkDb();
-        if (dbCheck) {
-            dataBaseService.initDataBase();
+        logger.info("[checkPersistence] begin check the persistence...");
+        HttpServletRequest request = null;
+        String persistence = request.getParameter("db_version");
+        if (persistence == "mysql") {
+            dbCheck = configService.checkDb();
+            if (dbCheck) {
+                dataBaseService.initDataBase();
+                return dbCheck;
+            }
+        } else {
+            redisCheck = configService.checkRedis();
+            return redisCheck;
         }
-        return dbCheck;
+        return false;
     }
     
     @Description("注册issuer")
