@@ -187,7 +187,8 @@ public class ConfigService {
         return generateProperties();
     }
     
-    public boolean processDbConfig(String mysqlAddress, String database, String username,
+    public boolean processDbConfig(String persistenceType, String mysqlAddress, String database,
+                                   String username,
                                    String mysqlPassword, String redisAddress,
                                    String redisPassword) {
         List<String> listStr = FileUtils.readFileToList("run.config");
@@ -197,18 +198,21 @@ public class ConfigService {
                 buffer.append(string).append("\n");
                 continue;
             }
-            if (string.startsWith("mysql_address")) {
-                buffer.append("mysql_address=").append(mysqlAddress).append("\n");
+
+            if (string.startsWith("persistence_type")){
+                buffer.append("persistence_type=").append(replaceNull(persistenceType)).append("\n");
+            }else if (string.startsWith("mysql_address")) {
+                buffer.append("mysql_address=").append(replaceNull(mysqlAddress)).append("\n");
             } else if (string.startsWith("mysql_database")) {
-                buffer.append("mysql_database=").append(database).append("\n");
+                buffer.append("mysql_database=").append(replaceNull(database)).append("\n");
             } else  if (string.startsWith("mysql_username")) {
-                buffer.append("mysql_username=").append(username).append("\n");
+                buffer.append("mysql_username=").append(replaceNull(username)).append("\n");
             } else if (string.startsWith("mysql_password")) {
-                buffer.append("mysql_password=").append(mysqlPassword).append("\n");
+                buffer.append("mysql_password=").append(replaceNull(mysqlPassword)).append("\n");
             } else if (string.startsWith("redis_address")) {
-                buffer.append("redis_address=").append(redisAddress).append("\n");
+                buffer.append("redis_address=").append(replaceNull(redisAddress)).append("\n");
             } else if (string.startsWith("redis_password")) {
-                buffer.append("redis_password=").append(redisPassword).append("\n");
+                buffer.append("redis_password=").append(replaceNull(redisPassword)).append("\n");
             } else {
                 buffer.append(string).append("\n");
             }
@@ -217,6 +221,14 @@ public class ConfigService {
         backRunConfig();
         //根据模板生成配置文件
         return generateProperties();
+    }
+
+    //将空值转换成空字符串
+    public String replaceNull(String v) {
+        if (v == null) {
+            return "";
+        }
+        return v;
     }
     
     public boolean checkDb() {
@@ -350,6 +362,7 @@ public class ConfigService {
         fileStr = fileStr.replace("${ORG_ID}", loadConfig.get("org_id"));
         fileStr = fileStr.replace("${AMOP_ID}", loadConfig.get("amop_id"));
         fileStr = fileStr.replace("${BLOCKCHIAN_NODE_INFO}", loadConfig.get("blockchain_address"));
+        fileStr = fileStr.replace("${PERSISTENCE_TYPE}", loadConfig.get("persistence_type"));
         fileStr = fileStr.replace("${MYSQL_ADDRESS}", loadConfig.get("mysql_address"));
         fileStr = fileStr.replace("${MYSQL_DATABASE}", loadConfig.get("mysql_database"));
         fileStr = fileStr.replace("${MYSQL_USERNAME}", loadConfig.get("mysql_username"));

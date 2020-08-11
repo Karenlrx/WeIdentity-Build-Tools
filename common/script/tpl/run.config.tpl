@@ -26,6 +26,7 @@ chain_id=1
 group_id=1
 
 #Configure your database information
+persistence_type=
 mysql_address=
 mysql_database=
 mysql_username=

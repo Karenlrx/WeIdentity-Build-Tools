@@ -339,11 +339,11 @@ $(document).ready(function(){
         }
     }
 
-    $("#dbForm  #db_version").change(function(){
+    $("#dbForm  #persistence_type").change(function(){
         var selected = $(this).children('option:selected').val();
         console.log(selected);
         dbDisplay(selected);
-    })
+    });
 
     // 提交数据库配置
     $("#postDbBtn").click(function(){
@@ -356,9 +356,10 @@ $(document).ready(function(){
     	    return ;
         }
 	    var formData = new FormData();
-	    var dbVersion = $.trim($("#dbForm  #db_version").val());
+	    var dbVersion = $.trim($("#dbForm  #persistence_type").val());
 	    console.log(dbVersion);
-	    formData.append("db_version", dbVersion);
+	    formData.append("persistence_type", dbVersion);
+	    console.log(formData.get("persistence_type"));
 	    if (dbVersion == "mysql") {
             formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
             formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
@@ -390,7 +391,7 @@ $(document).ready(function(){
     });
     
     function checkInputDB() {
-        var dbVersion = $.trim($("#dbForm  #db_version").val());
+        var dbVersion = $.trim($("#dbForm  #persistence_type").val());
         if (dbVersion == "mysql") {
             var address = $.trim($("#dbForm  #mysql_address").val());
             if (address.length == 0) {
@@ -463,42 +464,6 @@ $(document).ready(function(){
         });
     }
 
-    function checkredis() {
-        $.get("checkRedis",function(data,status){
-           if(data) {//检查成功
-               $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='success-span'>成功</span>。</p>");
-               $("#goNext").removeClass("disabled");
-               //disabledInput();
-               $("#goNext").addClass("bdGoNext");
-               $("#goNext").click(function(){
-                   let hasClass = $(this).hasClass('bdGoNext')
-                   if (hasClass) {
-                       $("#modal-default").modal("hide");
-                       $("#goNext").removeClass("nodeGoNext");
-                       $("#goNext").removeClass("bdGoNext");
-                       $("#modal-default").modal("hide");
-                       var formData = {};
-                       $.post("checkOrgId", formData, function(value,status){
-                          if (value == 1) {
-                              // 流程走完
-                              sessionStorage.removeItem('guide_step')
-                              toIndex();
-                          } else if (value == 0){
-                              $('.swiper-button-next').trigger('click');
-                              sessionStorage.setItem('guide_step', '4')
-                              toAccount();
-                          } else {
-                              $("#messageBody").html("<p><span class='fail-span'>程序出现异常，请查看日志</span></p>");
-                              $("#modal-message").modal();
-                          }
-                       })
-                   }
-              })
-           } else {//检查失败
-               $("#checkBody").html($("#checkBody").html() + "<p>配置检查<span class='fail-span'>失败</span>，请确认配置是否正确。</p>");
-           }
-        });
-    }
 
     // 点击选择生成秘钥
     $('.key_item').click(function(){

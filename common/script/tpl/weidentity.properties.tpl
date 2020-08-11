@@ -18,10 +18,13 @@ nodes=${BLOCKCHIAN_NODE_INFO}
 
 #######################################################################################################
 #                                                                                                     #
-#         datasource config                                                                           #
+#         persistence config                                                                          #
 #                                                                                                     #
 #######################################################################################################
 # Persistence Layer configurations. Do NOT change this if you are not using Persistence Layer features!
+#Support the persistence of mysql and redis. You can choose the type of persistence.
+persistence_type=${PERSISTENCE_TYPE}
+
 # MySQL connection config
 # Support multiple data source configurations with comma-separated multiple data sources.
 datasource.name=datasource1
@@ -40,15 +43,7 @@ datasource1.jdbc.timeBetweenEvictionRunsMillis=600000
 datasource1.jdbc.numTestsPerEvictionRun=5
 datasource1.jdbc.minEvictableIdleTimeMillis=1800000
 
-
-########################################################################################################
-##                                                                                                     #
-##         redisson config                                                                             #
-##                                                                                                     #
-########################################################################################################
-# Persistence Layer configurations. Do NOT change this if you are not using Persistence Layer features!
 # Redisson config
-# Support multiple data source configurations with comma-separated multiple data sources.
 # If you want to configure redis in cluster mode, enter multiple node addresses separated by commas.
 redis.url=${REDIS_ADDRESS}
 redis.password=${REDIS_PASSWORD}

@@ -100,10 +100,10 @@
               <form role="form" id="dbForm">
                 <div id="dbFormDiv" class="card-body">
                 <div class="form-group">
-                        <label for="db_version">数据库类型</label> <span
+                        <label for="persistence_type">数据库类型</label> <span
                         style="display: block;float:none;margin-bottom:0.5rem;color: gray;">
                   目前暂只支持MySql与Redis数据库</span>
-                        <select id="db_version" name="db_version" class="form-control">
+                        <select id="persistence_type" name="persistence_type" class="form-control">
                           <option value="mysql">MYSQL</option>
                           <option value="redis">REDIS</option>
                         </select>
@@ -139,7 +139,7 @@
                     </div>
                     <div class="form-group">
                       <label for="redis_password">服务器密码</label>
-                      <div style="display:block; font-size: 13px;color:gray;">如未设置密码可不填写，默认为null
+                      <div style="display:block; font-size: 13px;color:gray;">如未设置密码可不填写
                       </div>
                       <input type="password" class="form-control" id="redis_password"
                              placeholder="Enter password">
@@ -148,7 +148,8 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                  <button type="button"  id="postBtn" class="btn btn-block btn-primary btn-flat">完成</button>
+                  <button type="button"  id="postBtn" class="btn btn-block btn-primary btn-flat">
+                    确认</button>
                 </div>
              </form>
              <div class='sql_warning'>

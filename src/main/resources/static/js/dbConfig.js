@@ -1,12 +1,16 @@
 $(document).ready(function(){
 	//获取配置
     $.get("loadConfig",function(data,status){
+        $("#dbForm  #persistence_type").val(data.persistence_type);
         $("#dbForm  #mysql_address").val(data.mysql_address);
         $("#dbForm  #mysql_database").val(data.mysql_database);
         $("#dbForm  #mysql_username").val(data.mysql_username);
         $("#dbForm  #mysql_password").val(data.mysql_password);
         $("#dbForm  #redis_address").val(data.redis_address);
         $("#dbForm  #redis_password").val(data.redis_password);
+        if (data.persistenceType == "mysql" || data.persistence_type == "redis") {
+            dbDisplay(data.persistence_type);
+        }
     });
 
     function dbDisplay(v) {
@@ -19,11 +23,14 @@ $(document).ready(function(){
         }
     }
 
-   $("#db_version").change(function(){
-        var selected = $(this).children('option:selected').val();
-        dbDisplay(selected);
-   })
+    var persistenceType = $.trim($("#dbForm  #persistence_type").val());
+    dbDisplay(persistenceType);
 
+    $("#persistence_type").change(function(){
+         var selected = $(this).children('option:selected').val();
+//         console.log(selected);
+         dbDisplay(selected);
+    })
     //提交配置
     $("#postBtn").click(function(){
     	var disabled = $(this).attr("class").indexOf("disabled");
@@ -35,10 +42,10 @@ $(document).ready(function(){
     	    return ;
         }
 	    var formData = new FormData();
-	    var dbVersion = $.trim($("#dbForm  #db_version").val());
-	    console.log(dbVersion);
-        formData.append("db_version", $.trim($("#dbForm  #db_version").val()));
-        console.log(formData);
+	    var dbVersion = $.trim($("#dbForm  #persistence_type").val());
+//	    console.log(dbVersion);
+        formData.append("persistence_type", $.trim($("#dbForm  #persistence_type").val()));
+        console.log(formData.get("persistence_type"));
 	    if (dbVersion == "mysql") {
             formData.append("mysql_address", $.trim($("#dbForm  #mysql_address").val()));
             formData.append("mysql_database", $.trim($("#dbForm  #mysql_database").val()));
@@ -75,7 +82,8 @@ $(document).ready(function(){
         })
     });
     function checkInput() {
-        var dbVersion = $.trim($("#dbForm  #db_version").val());
+        var dbVersion = $.trim($("#dbForm  #persistence_type").val());
+        console.log(dbVersion);
         if (dbVersion == "mysql") {
             var address = $.trim($("#dbForm  #mysql_address").val());
             if (address.length == 0) {
@@ -147,7 +155,7 @@ $(document).ready(function(){
 
 
     function disabledInput() {
-    	$("#dbForm  #db_version").attr("disabled",true);
+    	$("#dbForm  #persistence_type").attr("disabled",true);
     	$("#dbForm  #mysql_address").attr("disabled", true);
         $("#dbForm  #mysql_database").attr("disabled", true);
         $("#dbForm  #mysql_username").attr("disabled", true);
