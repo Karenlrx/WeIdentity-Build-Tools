@@ -315,18 +315,54 @@ $(document).ready(function(){
 		})
 
     })
-    
+
     function toDbConfig() {
-    	$.get("loadConfig",function(data,status){
-            $("#dbForm  #mysql_address").val(data.mysql_address);
-            $("#dbForm  #mysql_database").val(data.mysql_database);
-            $("#dbForm  #mysql_username").val(data.mysql_username);
-            $("#dbForm  #mysql_password").val(data.mysql_password);
-            $("#dbForm  #redis_address").val(data.redis_address);
-            $("#dbForm  #redis_password").val(data.redis_password);
-        });
-    	$("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>");
-    	$("#modal-message").modal();
+        if (localStorage) {
+            /*
+            * 读出localstorage中的值
+            */
+            if (localStorage.persistence_type) {
+                $("#dbForm  #persistence_type").find("option[value=" + localStorage.persistence_type + "]").attr("selected", true);
+                dbDisplay(localStorage.persistence_type);
+            }
+            if (localStorage.mysql_address) {
+                $("#dbForm  #mysql_address").val(localStorage.mysql_address);
+            }
+            if (localStorage.mysql_database) {
+                $("#dbForm  #mysql_database").val(localStorage.mysql_database);
+            }
+            if (localStorage.mysql_username) {
+                $("#dbForm  #mysql_username").val(localStorage.mysql_username);
+            }
+            if (localStorage.mysql_password) {
+                $("#dbForm  #mysql_password").val(localStorage.mysql_password);
+            }
+            if (localStorage.redis_address) {
+                $("#dbForm  #redis_address").val(localStorage.redis_address);
+            }
+            if (localStorage.redis_password) {
+                $("#dbForm  #redis_password").val(localStorage.redis_password);
+            }
+            /*
+            * 当表单中的值改变时,localstorage的值也改变
+            */
+            $("input[type=text],select,textarea").change(function(){
+                $this = $(this);
+                localStorage[$this.attr("id")] = $this.val();
+                console.log(localStorage);
+            });
+        } else {
+            $.get("loadConfig",function(data,status){
+                $("#dbForm  #mysql_address").val(data.mysql_address);
+                $("#dbForm  #mysql_database").val(data.mysql_database);
+                $("#dbForm  #mysql_username").val(data.mysql_username);
+                $("#dbForm  #mysql_password").val(data.mysql_password);
+                $("#dbForm  #redis_address").val(data.redis_address);
+                $("#dbForm  #redis_password").val(data.redis_password);
+            });
+        }
+        $("#messageBody").html("<p><span class='success-span'>如果您需要使用到下列功能，则需要配置数据库</span><br/>1.Transportation相关组件功能<br/>2.Evidence异步存证功能<br/>3.Persistence数据存储功能(例如：存储Credential)</p>");
+        $("#modal-message").modal();
     }
 
     function dbDisplay(v) {
@@ -383,6 +419,7 @@ $(document).ready(function(){
                     //检查节点是否正确
                     $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='success-span'>成功</span>, 检查准备中,请稍后...</p>");
                     setTimeout(checkForTimeout,2000);
+                    localStorage.clear();
                 } else {
                      $("#checkBody").html($("#checkBody").html() + "<p>配置提交<span class='fail-span'>失败</span>,请查看服务端日志。</p>");
                 }

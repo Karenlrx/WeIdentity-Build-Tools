@@ -77,12 +77,13 @@ import com.webank.weid.dto.WeIdInfo;
 import com.webank.weid.exception.WeIdBaseException;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.ResponseData;
+import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.CheckNodeFace;
 import com.webank.weid.service.ConfigService;
 import com.webank.weid.service.DataBaseService;
-import com.webank.weid.service.BuildToolService;
 import com.webank.weid.service.DeployService;
 import com.webank.weid.service.TransactionService;
+import com.webank.weid.service.VerifyConfigService;
 import com.webank.weid.service.impl.inner.PropertiesService;
 import com.webank.weid.service.v2.CheckNodeServiceV2;
 import com.webank.weid.util.DataToolUtils;
@@ -117,7 +118,10 @@ public class BuildToolController {
     
     @Autowired
     DataBaseService dataBaseService;
-    
+
+    @Autowired
+    VerifyConfigService verifyConfigService;
+
     @Value("${weid.build.tools.down:false}")
     private String isDownFile;
     
@@ -143,7 +147,16 @@ public class BuildToolController {
         String groupId = configService.loadConfig().get("group_id");
         return deployService.getAllGroup(false).contains(groupId);
     }
-    
+
+    @GetMapping("/persistenceCheckState")
+    public boolean persistenceCheckState(HttpServletRequest request) {
+        String persistenceType = configService.loadConfig().get("persistence_type");
+        if (persistenceType.equals("mysql") || persistenceType.equals("redis") ) {
+            return verifyPersistence(persistenceType);
+        }
+        return false;
+    }
+
     @GetMapping("/checkState")
     public Map<String, Boolean> checkState(HttpServletRequest request) {
         Map<String, Boolean> result = new HashMap<String, Boolean>();
@@ -151,6 +164,7 @@ public class BuildToolController {
         result.put("nodeState", nodeCheckState());
         result.put("dbState", dbCheckState(request));
         result.put("groupState", groupCheckState());
+        result.put("checkPersistenceState", persistenceCheckState(request));
         return result;
     }
     
@@ -499,7 +513,7 @@ public class BuildToolController {
         }
         return BuildToolsConstant.FAIL;
     }
-    
+
     @Description("数据库检查")
     @GetMapping("/checkPersistence")
     public boolean checkPersistence() {
@@ -515,13 +529,22 @@ public class BuildToolController {
                 dataBaseService.initDataBase();
                 return dbCheck;
             }
-        } else {
+        } else if (persistence.equals("redis")) {
             dbCheck = configService.checkRedis();
             return dbCheck;
         }
         return false;
     }
-    
+
+    @Description("数据库验证")
+    @PostMapping("/verifyPersistence")
+    public boolean verifyPersistence(@RequestParam("persistenceType") String persistenceType) {
+        logger.info("[verifyPersistence] begin verify the persistence config = {}.", persistenceType);
+        boolean result = verifyConfigService.verifyPersistence(persistenceType);
+        PropertyUtils.reload();
+        return result;
+    }
+
     @Description("注册issuer")
     @PostMapping("/registerIssuer")
     public String registerIssuer(
