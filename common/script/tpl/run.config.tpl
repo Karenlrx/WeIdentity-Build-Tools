@@ -16,6 +16,9 @@ blockchain_fiscobcos_version=2
 #your organization name, used for communication on blockchain.
 org_id=
 
+#amop_id
+amop_id=
+
 #chain id
 chain_id=1
 
@@ -23,16 +26,16 @@ chain_id=1
 group_id=1
 
 #Configure your database information
+persistence_type=
 mysql_address=
 mysql_database=
 mysql_username=
 mysql_password=
+redis_address=
+redis_password=
 
 #This variable is used to distinguish the environment. You can use "dev" to set the development environment, 
 #"stg" to set the test environment, "prd" to set the production environment.
 #If you do not set it, the system will use allOrg as the environment by default. 
 #It is not recommended. Production use default configuration
 cns_profile_active=prd
-
-#Set up the contract you use with this configuration.
-cns_contract_follow=

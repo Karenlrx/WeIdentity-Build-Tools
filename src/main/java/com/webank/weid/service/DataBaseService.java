@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018-2020) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-build-tools.
+ *
+ *       weidentity-build-tools is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-build-tools is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-build-tools.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.weid.service;
 
 import org.slf4j.Logger;
@@ -6,10 +25,10 @@ import org.springframework.stereotype.Service;
 
 import com.webank.weid.constant.DataDriverConstant;
 import com.webank.weid.constant.SqlConstant;
-import com.webank.weid.suite.api.persistence.Persistence;
-import com.webank.weid.suite.persistence.sql.ConnectionPool;
-import com.webank.weid.suite.persistence.sql.SqlExecutor;
-import com.webank.weid.suite.persistence.sql.driver.MysqlDriver;
+import com.webank.weid.suite.persistence.mysql.ConnectionPool;
+import com.webank.weid.suite.persistence.mysql.SqlExecutor;
+import com.webank.weid.suite.api.persistence.inf.Persistence;
+import com.webank.weid.suite.api.persistence.PersistenceFactory;
 
 @Service
 public class DataBaseService {
@@ -32,14 +51,14 @@ public class DataBaseService {
     
     private Persistence getPersistence() {
         if (persistence == null) {
-            persistence = new MysqlDriver();
+            persistence = PersistenceFactory.newMysqlDriver();
         }
         return persistence;
     }
     
     private SqlExecutor getSqlExecutor() {
         if (sqlExecutor == null) {
-            sqlExecutor = new SqlExecutor(ConnectionPool.getFirstDataSourceName()); 
+            sqlExecutor = new SqlExecutor(ConnectionPool.getFirstDataSourceName());
         }
         return sqlExecutor;
     }
