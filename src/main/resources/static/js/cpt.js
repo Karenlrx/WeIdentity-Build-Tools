@@ -1,11 +1,18 @@
 $(document).ready(function(){
 	bsCustomFileInput.init();
-	if (!isReady) {
-    	return;
-    }
-    loadData();
-
+    $("#openRegisterCpt").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#modal-register-cpt").modal();
+        }
+    });
+    
     $("#cptToPojoBtn").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+    		return;
+        }
     	var $this = this;
     	var cptIds = getCptIds();
         if (cptIds.length == 0) {
@@ -33,20 +40,35 @@ $(document).ready(function(){
         })
     });
     
-    var registerCptResult = false;
+    var isClose = false;
     
     $('#modal-message').on('hide.bs.modal', function () {
     	$("#modal-message .modal-dialog").removeClass("modal-lg");
 	})
 	
 	$('#modal-confirm-message').on('hide.bs.modal', function () {
-		if (registerCptResult) {
-			$("#modal-register-cpt").modal("hide");
+		if (isClose) {
+			$("#modal-register-cpt").modal("hide");			
 		}
 	})
 	
+	$('#modal-confirm-message1').on('hide.bs.modal', function () {
+		if (isClose) {
+			$("#modal-cpt-to-policy").modal("hide");			
+		}
+	})
 	
-    
+	$("#confirmMessage1Btn").click(function(){
+		var disabled = $(this).attr("class").indexOf("disabled");
+	    if(disabled > 0) return;
+		$("#modal-confirm-message1").modal("hide");
+	})
+	
+	if (!isReady) {
+    	return;
+    }
+    loadData();
+
 	//json编辑器
     var options = {
 		mode: 'code',
@@ -57,17 +79,12 @@ $(document).ready(function(){
 	};
 
     var editor = new JSONEditor(jQuery("#jsonContent").get(0), options);
+    editor.setText("");
     //注册CPT
     $("#registerCpt").click(function(){
     	var thisObj = this;
     	var disabled = $(thisObj).attr("class").indexOf("disabled");
         if(disabled > 0) return;
-	    var file = $("#cptJsonFile")[0].files[0];
-	    if (file == null || !vaildFileName(file.name)) {
-	    	$("#messageBody").html("<p>请选择正确的Json格式文件</p>");
-	    	$("#modal-message").modal();
-	    	return;
-	    }
 	    var cptJson = null;
 	    try {
 	    	cptJson = JSON.stringify(editor.get());
@@ -83,7 +100,6 @@ $(document).ready(function(){
 	    }
 	    var cptId = $("#nodeForm  #registerCptId").val();
 	    var formData = new FormData();
-	    formData.append("fileName", file.name);
 	    formData.append("cptJson", cptJson);
 	    formData.append("cptId", cptId);
 	    var btnValue = $(thisObj).html();
@@ -97,10 +113,10 @@ $(document).ready(function(){
 	        processData: false,
 	        success:function(res) {
 	            console.log(res);
-	            registerCptResult = false;
+	            isClose = false;
 	            if (res=="success") {
 	            	$("#confirmMessageBody").html("<p>凭证类型(CPT)注册<span class='success-span'>成功</span>。</p>");
-	            	registerCptResult = true;
+	            	isClose = true;
 	            	loadData();
 	            } else if (res=="fail") {
 	            	$("#confirmMessageBody").html("<p>凭证类型(CPT)注册<span class='fail-span'>失败</span>，请查看服务端日志。</p>");
@@ -114,6 +130,31 @@ $(document).ready(function(){
 	    })
     })
     
+    $('.template_btn').click(function(){
+    	let cptJson = editor.getText()
+    	try {
+    		var $this = this;
+    		var orginCode = $($this).next().find('pre').text();
+	    	if (!cptJson || cptJson == '{}') {
+	    		editor.setText(orginCode);
+	    	} else {
+	    		let code = JSON.stringify(JSON.parse(orginCode))
+	    		cptJson = JSON.stringify(JSON.parse(cptJson))
+	    		if (cptJson != code) {
+	    			$.confirm("确认要覆盖下列代码片段?",function() {
+		    			editor.setText(orginCode);
+		    		})
+	    		}
+	    	}
+    	} catch (e) {
+	    	$("#messageBody").html("<pre>Error：" + e.message + "</pre>");
+    		$("#modal-message").modal();
+    		return;
+	    }
+		
+	})
+    
+    
     function vaildFileName(fileName) {
     	var v = fileName.substring(fileName.lastIndexOf("."));
     	if (v != ".json" && v != ".JSON") {
@@ -124,7 +165,7 @@ $(document).ready(function(){
 	$("#cptJsonFile").change(function(){
     	var file = $("#cptJsonFile")[0].files[0];
     	if (file == null || file == undefined) {
-    		editor.set(JSON.parse("{}"));
+    		editor.setText("");
     	} else {
     		let reader = new FileReader();
             reader.readAsText(file, 'utf-8');
@@ -134,12 +175,8 @@ $(document).ready(function(){
     	}
     })
     
-    $("#openRegisterCpt").click(function(){
-    	$("#modal-register-cpt").modal();
-    });
-    
     $('#modal-register-cpt').on('hide.bs.modal', function () {
-    	editor.set(JSON.parse("{}"));
+    	editor.setText("");
     	$("#cptJsonFile").val("");
 		$(".custom-file-label").html("选择CPT文件...");
 	})
@@ -152,6 +189,40 @@ $(document).ready(function(){
 		});
     	fixSelectAll();
     });
+	
+	//cpt转policy
+    $("#cptToPolicy").click(function(){
+        var thisObj = this;
+        var disabled = $(thisObj).attr("class").indexOf("disabled");
+        if(disabled > 0) return;
+        var cptId = $("#fromCptId").val();
+        var policyId = $("#policyId").val();
+        var btnValue = $(thisObj).html();
+        $(thisObj).html("转换中，请稍后...");
+        $(thisObj).addClass("disabled");
+        $("#confirmMessage1Body").html("<p>转换中，请稍后...</p>");
+        $("#confirmMessage1Btn").addClass("disabled");
+        $("#modal-confirm-message1").modal();
+        var formData = {};
+        formData.cptId = cptId;
+        formData.policyId = policyId;
+        formData.policyType = $("#policyType").val();
+        $.post("cptToPolicy", formData, function(value,status){
+        	isClose = false;
+            if (value == "success") {
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='success-span'>成功</span>。</p>");
+                isClose = true;
+            } else if (value == "fail") {
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='fail-span'>失败</span>，请查看日志。</p>");
+            } else {
+                $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>CPT转Policy操作<span class='fail-span'>失败</span>: " + value + "</p>");
+            }
+            $(thisObj).html(btnValue);
+            $(thisObj).removeClass("disabled");
+            $("#confirmMessage1Btn").removeClass("disabled");
+            $("#modal-confirm-message1").modal();
+        })
+    })
 });
 var template = $("#data-tbody").html();
 var  table;
@@ -255,3 +326,8 @@ function getCptIds() {
 	return cptIds;
 }
 
+function showCptToPolicy(cptId) {
+	$("#fromCptId").val(cptId)
+	$("#policyId").val("")
+	$("#modal-cpt-to-policy").modal();
+}

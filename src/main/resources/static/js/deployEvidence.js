@@ -1,15 +1,27 @@
 $(document).ready(function(){
+	var hashChildGroup = false;
+	$("#depolyBtn").click(function(){
+    	if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	//判断是否有子群组
+        	if (hashChildGroup) {
+        		$("#modal-evidence-deploy").modal();
+        	} else {
+        		$("#messageBody").html("<p>当前“WeIdentity 部署工具”连接的区块链节点只加入了一个区块链群组，且这个群组是主群组。我们不支持在主群组上额外部署 Evidence 智能合约。</p>");
+    	       	$("#modal-message").modal();
+        	}
+        }
+    });
 	if (!isReady) {
     	return;
     }
     loadData();
-
-    $("#depolyBtn").click(function(){
-    	$("#modal-evidence-deploy").modal();
-    });
-    
     //加载issuerTypeList
-    $("#groupId").loadSelect("getAllGroup","value", "value",function(data){
+    $("#groupId").loadSelect("getAllGroup/true","value", "value",function(data){
+    	if (data.length > 0) {
+    		hashChildGroup = true;
+    	}
     });
     
     var isClose = false;
@@ -34,10 +46,10 @@ $(document).ready(function(){
         	   isClose = true;
            } else {
         	   $("#confirmMessage1Body").html($("#confirmMessage1Body").html() + "<p>存证部署<span class='fail-span'>失败</span>，请联系管理员。</p>");
+        	   $("#confirmMessage1Btn").removeClass("disabled");
            }
            $($this).html(btnValue);
            $($this).removeClass("disabled");
-           $("#confirmMessage1Btn").removeClass("disabled");
            $("#modal-confirm-message1").modal();
         })
     });
@@ -58,38 +70,79 @@ var template = $("#data-tbody").html();
 var  table;
 function loadData() {
 	 //加载部署数据
-	$.get("getShareList",function(data,status){
-  		if(table != null) {
- 			table.destroy();
- 		}
- 		$("#data-tbody").renderData(template,data);
- 		table = $('#example2').DataTable({
- 	      "paging": true,
- 	      "iDisplayLength": 10,
- 	      "lengthChange": false,
- 	      "searching": true,
- 	      "ordering": true,
- 	      "info": false,
- 	      "autoWidth": false,
- 	      "order": [[ 2, "desc" ], [ 3, "desc" ]],
-	  	  "aoColumnDefs": [
-	          { "sType": "operation-column", "aTargets": [4] },    //指定列号使用自定义排序
-	      ],
+	$('#example2').DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": true,
+	      "serverSide": false,
+	      "ordering": true,
+	      "info": false,
+	      "destroy": true,
+	      "autoWidth": false,
+	      "iDisplayLength": 7,
+	      "order": [[ 5, "desc" ], [ 4, "desc" ]],
 	      "oLanguage": {
 	    	  "sZeroRecords": "对不起，查询不到任何相关数据",
- 	    	  "oPaginate": {
+	    	  "oPaginate": {
 	            "sFirst":    "第一页",
 	            "sPrevious": " 上一页 ",
 	            "sNext":     " 下一页 ",
 	            "sLast":     " 最后一页 "
-	          }
-	      }
- 		});
- 		processCnsBtn();
- 		table.on('draw', function () {
- 			processCnsBtn();
- 		}); 
-  })
+	          } 
+	      },
+	      "sAjaxSource":"getShareList",
+	      "fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+	    	oSettings.jqXHR = $.ajax({
+	    		  "dataType": 'json',
+	    		  "type": "GET",
+	    		  "url": sSource,
+	    		  "data": aoData,
+	    		  "success": function(data) {
+	    			  var ndata = {};//返回的数据需要固定格式，否则datatables无法解析，所以需要重新组装
+	    			  ndata.data = data;
+	    			  ndata.recordsTotal = data.lenght;
+	    			  ndata.recordsFiltered = ndata.lenght;
+	    			  fnCallback(ndata);
+	    		  }
+	         });
+	      },
+	      columns:[
+	          {"render": function ( data, type, full, meta) {
+	        	  return "<a href='javascript:showDeploy(\"" + full.hash +"\", \"" + full.owner + "\")'>" + full.hashShow + "</a><div class='display-none'>" + full.hash + "</div>"
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return "<a href='javascript:showWeId(\"" + full.owner + "\")'>" + full.ownerShow + "</a><div class='display-none'>" + full.owner + "</div>"
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  if (full.issuer != null) {
+	        		  var name = full.issuer.name;
+	        		  if (full.issuer.recognized) {
+	        			  name += "&nbsp;<image src='dist/img/recognize.svg' widht='50' height='50'/>"
+	        		  } else {
+	        			  name += "&nbsp;<image src='dist/img/deRecognize.svg' widht='50' height='50'/>" 
+	        		  }
+	        		  return name
+	        	  }
+	        	  return ""
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return full.showGroupId
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  return full.createTime
+	          }},
+	          {"render": function ( data, type, full, meta) {
+	        	  var btnHtml = "";
+	        	  if (full.enable) {
+	        		  btnHtml += "<button type='button' name='cnsEnableBtn'  class='btn btn-inline btn-primary btn-flat ' disabled>已启用</button>&nbsp;&nbsp;";
+	        	  } else {
+	        		  btnHtml += "<button type='button' name='cnsEnableBtn' onclick='enableHash(\"" + full.hash + "\" , \"" + full.groupId + "\")' class='btn btn-inline btn-primary btn-flat'>启用</button>&nbsp;&nbsp;";
+	        	  }
+	        	  btnHtml += "<button type='button' name='cnsRemoveBtn' onclick='removeHash(\"" + full.hash + "\", this)'   class='btn btn-inline btn-primary btn-flat'>删除</button>&nbsp;&nbsp;";
+	        	  return btnHtml
+	          }}
+	        ]
+	    });
 }
 
 function checkFirstDeploy(hash, groupId) {
@@ -99,6 +152,7 @@ function checkFirstDeploy(hash, groupId) {
 			enableEvidenHash(hash, groupId);
 		} else {
 			loadData();
+			$("#confirmMessage1Btn").removeClass("disabled");
 		}
 	});
 }

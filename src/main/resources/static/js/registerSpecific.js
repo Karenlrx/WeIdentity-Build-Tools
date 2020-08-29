@@ -1,5 +1,12 @@
 $(document).ready(function(){
-	
+	$("#registerIssuerTypeBtn").click(function(){
+		if (!isReady) {
+    		showMessageForNodeException();
+        } else {
+        	$("#addIssuerType").val("");
+        	$("#modal-register-issue-type").modal();
+        }
+    });
     if (!isReady) {
     	return;
     }
@@ -12,47 +19,45 @@ $(document).ready(function(){
         if(disabled > 0) return;
         var type = $.trim($("#addIssuerType").val());
         if (type.length == 0) {
-        	 $("#messageBody").html("<p>请输入issuer type。</p>");
+        	 $("#messageBody").html("<p>请输入白名单名称。</p>");
         	 $("#modal-message").modal();
     		return;
     	}
         if (type.indexOf("@") == 0) {
-        	$("#messageBody").html("<p>输入非法的issuer type。</p>");
+        	$("#messageBody").html("<p>输入非法的白名单名称。</p>");
 	       	$("#modal-message").modal();
 	   		return;
         }
         $($this).addClass("disabled");
-        $($this).html("注册中,  请稍等...");
+        var btnValue = $($this).html();
+        $($this).html("新增中,  请稍等...");
         isClose = false;
         var formData = {};
 	    formData.issuerType = type;
     	$.post(escape("registerIssuerType"), formData, function(value,status){
         	if (value == "success") {
-                $("#confirmMessageBody").html("<p>注册<span class='success-span'>成功</span>。</p>");
+                $("#confirmMessageBody").html("<p>新增<span class='success-span'>成功</span>。</p>");
                 loadData();
                 isClose = true;
             }  else if (value == "fail") {
-            	 $("#confirmMessageBody").html("<p>注册<span class='fail-span'>失败</span>，请联系管理员。</p>");
+            	 $("#confirmMessageBody").html("<p>新增<span class='fail-span'>失败</span>，请联系管理员。</p>");
             } else {
             	 $("#confirmMessageBody").html("<p>"+value+"</p>");
             }
-            $($this).html("注册");
+            $($this).html(btnValue);
             $($this).removeClass("disabled");
             $("#modal-confirm-message").modal();
         })
     });
     
-    $("#registerIssuerTypeBtn").click(function(){
-    	$("#addIssuerType").val("");
-    	$("#modal-register-issue-type").modal();
-    });
+    
     $("#addToIssuerType").click(function(){
         var $this = this;
         var disabled = $($this).attr("class").indexOf("disabled");
         if(disabled > 0) return;
         var weId = $.trim($("#addIssuerWeId").val());
         if (weId.length == 0) {
-       	    $("#messageBody").html("<p>请输入weId。</p>");
+       	    $("#messageBody").html("<p>请输入WeID。</p>");
        	    $("#modal-message").modal();
             return;
         }

@@ -24,7 +24,11 @@ apply plugin: 'idea'
 apply plugin: 'signing'
 group = 'com.webank'
 
-version = "1.0.13-rc.4-SNAPSHOT"
+version = "0.0.0"
+def versionFile = file("VERSION")
+versionFile.eachLine { line ->
+    version = line
+}
 def repo ="${repoType}"
 
 // Specify JDK version - may vary in different scenarios
@@ -84,6 +88,10 @@ List mysql_driver = [
         "mysql:mysql-connector-java:8.0.20"
 ]
 
+List redis_driver = [
+        "org.redisson:redisson:3.13.1"
+]
+
 def spring_version = "5.2.2.RELEASE"
 List spring = [
         "org.springframework:spring-aop:$spring_version",
@@ -116,7 +124,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-websocket")
     if (gradleVer.startsWith("4")) {
         if (!gradle.startParameter.isOffline()) {
-            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver
             compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
@@ -127,7 +135,7 @@ dependencies {
         if (!gradle.startParameter.isOffline()) {
             compileOnly 'org.projectlombok:lombok:1.18.12'
             annotationProcessor 'org.projectlombok:lombok:1.18.12'
-            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver
+            compile lombok, jcommander, log4j, spring, gson, json, mysql_driver, redis_driver
 			compile("com.webank:weid-java-sdk:${weidSdkVersion}") {
                 exclude group: "org.springframework", module: "*"
                 exclude group: "javax.validation", module: "validation-api"
@@ -220,7 +228,7 @@ jar {
     into('file') {
        from fileTree(file("./")){
             //自定义过滤规则
-            includes = ["*.sh"]
+            includes = ["*.sh", "VERSION"]
             excludes = ["build.sh"]
         }
         from 'common/script/tpl/run.config.tpl'
